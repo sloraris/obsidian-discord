@@ -13,6 +13,9 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.reactions = True
 intents.guilds = True
+intents.members = False
+intents.presences = False
+
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Constants
@@ -114,7 +117,9 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
+    for guild in bot.guilds:
+        print(f'{bot.user} has connected to {guild.name}')
+    print(f'{bot.user} is connected to {len(bot.guilds)} guild(s)')
 
 @bot.event
 async def on_message(message):
