@@ -17,6 +17,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Constants
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+ALLOWED_GUILD_IDS = os.getenv('ALLOWED_GUILD_IDS')
 OBSIDIAN_VAULT_PATH = os.getenv('OBSIDIAN_VAULT_PATH')
 BOT_CHANNEL_NAME = os.getenv('BOT_CHANNEL_NAME')
 SAVE_EMOJI_NAME = ('SAVE_EMOJI_NAME')
@@ -104,6 +105,12 @@ def create_note(message):
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content)
+
+@bot.event
+async def on_guild_join(guild):
+    if guild.id not in ALLOWED_GUILD_IDS:
+        await guild.leave()
+        print(f"Left unauthorized guild: {guild.name} ({guild.id})")
 
 @bot.event
 async def on_ready():

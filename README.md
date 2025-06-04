@@ -17,6 +17,11 @@ A Discord bot that saves messages to your Obsidian vault with intelligent file n
     # Discord Bot Token (from Discord Developer Portal)
     DISCORD_TOKEN=your_discord_bot_token
 
+    # Discord Server ID (from Discord server settings)
+    # This is the ID of the server where the bot will operate
+    # This is a security measure to prevent the bot from operating in other servers
+    ALLOWED_GUILD_IDS=your_discord_server_id
+
     # Path to your Obsidian vault
     # For local Python deployment: Use absolute path to your vault
     # Example: /Users/username/Documents/ObsidianVault
