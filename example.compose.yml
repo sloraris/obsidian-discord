@@ -1,0 +1,20 @@
+services:
+  bot:
+    image: ghcr.io/sloraris/obsidian-discord-bot
+    container_name: obsidian-discord-bot
+    volumes:
+      - ${OBSIDIAN_VAULT_PATH}:/vault
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Optional healthcheck
+    healthcheck:
+      test: ["CMD", "ps", "aux", "|", "grep", "[p]ython bot.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
