@@ -36,6 +36,11 @@ A Discord bot that saves messages to your Obsidian vault with intelligent file n
     # Name of your custom save emoji (without the : characters)
     # Example: If your emoji is :obsidian:, just put obsidian
     SAVE_EMOJI_NAME=obsidian
+
+    # Optional: Section in daily notes where content should be appended
+    # If specified, new content will be added under this section header
+    # Example: "Daily Log" will append content under "# Daily Log" or "## Daily Log"
+    DAILY_NOTE_SECTION=Daily Log
    ```
 
 2. Add a custom emoji named `:obsidian:` to your Discord server (you can change this to whatever you want in the `.env`)
@@ -120,6 +125,32 @@ A Discord bot that saves messages to your Obsidian vault with intelligent file n
 ## Note Formats
 
 ### Daily Note (`YYYY-MM-DD.md`)
+The bot now respects your Obsidian Daily Notes plugin settings for:
+- Note location (folder)
+- Filename format
+- Template file
+
+If `DAILY_NOTE_SECTION` is set, content will be appended under that section:
+```markdown
+# Thursday, March 14, 2024
+
+## Daily Log
+
+---
+## 14:30
+
+Your message content here...
+
+---
+## 15:45
+
+Another message content...
+
+## Other Section
+Other content...
+```
+
+If `DAILY_NOTE_SECTION` is not set, content will be appended to the end of the file:
 ```markdown
 # Thursday, March 14, 2024
 
