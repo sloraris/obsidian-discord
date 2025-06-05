@@ -117,6 +117,15 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_ready():
+    # Find and add the custom Obsidian emoji to bot's emoji array
+    for guild in bot.guilds:
+        obsidian_emoji = discord.utils.get(guild.emojis, name=SAVE_EMOJI_NAME)
+        if obsidian_emoji:
+            ACTION_EMOJIS[str(obsidian_emoji)] = 'save'
+            print(f'Found and added {SAVE_EMOJI_NAME} emoji to actions')
+            break
+
+    # List all guilds bot has successfully joined
     for guild in bot.guilds:
         print(f'{bot.user} has connected to {guild.name}')
     print(f'{bot.user} is connected to {len(bot.guilds)} guild(s)')
@@ -129,13 +138,6 @@ async def on_message(message):
         for emoji in ACTION_EMOJIS.keys():
             await message.add_reaction(emoji)
 
-        # Find the obsidian emoji in the server and wait for it to be reacted on the message
-        obsidian_emoji = discord.utils.get(message.guild.emojis, name=SAVE_EMOJI_NAME)
-        if obsidian_emoji:
-            print(f"{obsidian_emoji} found, waiting for message reaction...")
-            await message.add_reaction(obsidian_emoji)
-        else:
-            print(f"{SAVE_EMOJI_NAME} not found.")
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -179,6 +181,10 @@ async def on_raw_reaction_add(payload):
             daily_note_path = get_daily_note_path()
             ensure_daily_note_exists(daily_note_path)
             append_to_daily_note(daily_note_path, base_content)
+
+        # Remove reactions added by bot
+        for emoji in ACTION_EMOJIS.keys():
+            await message.remove_reaction(emoji, bot.user)
 
         # Add complete emoji reaction
         await message.add_reaction('✅')
