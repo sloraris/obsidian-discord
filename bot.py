@@ -115,8 +115,39 @@ async def on_guild_join(guild):
         await guild.leave()
         print(f"Left unauthorized guild: {guild.name} ({guild.id})")
 
+async def update_bot_status(status_type="default"):
+    """Update bot status based on current action."""
+    if status_type == "saving":
+        await bot.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.playing,
+                name="with today's notes 💾"
+            ),
+            status=discord.Status.online
+        )
+    elif status_type == "creating":
+        await bot.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.playing,
+                name="with new files ✨"
+            ),
+            status=discord.Status.online
+        )
+    else:
+        # Default status
+        await bot.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.watching,
+                name="files grow 🌱"
+            ),
+            status=discord.Status.online
+        )
+
 @bot.event
 async def on_ready():
+    # Set the default bot status
+    await update_bot_status()
+
     # Find and add the custom Obsidian emoji to bot's emoji array
     for guild in bot.guilds:
         obsidian_emoji = discord.utils.get(guild.emojis, name=SAVE_EMOJI_NAME)
@@ -137,7 +168,6 @@ async def on_message(message):
         # Add all action emojis as reactions
         for emoji in ACTION_EMOJIS.keys():
             await message.add_reaction(emoji)
-
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -175,9 +205,13 @@ async def on_raw_reaction_add(payload):
         # Process based on reactions
         if '📝' in user_reactions:
             # Create a new note
+            await update_bot_status("creating")
+            print(f"Creating new note with {message.id} content from ID")
             create_note(message)
         else:
             # Default to daily note
+            await update_bot_status("saving")
+            print(f"Adding message {message.id} content to daily note")
             daily_note_path = get_daily_note_path()
             ensure_daily_note_exists(daily_note_path)
             append_to_daily_note(daily_note_path, base_content)
@@ -186,12 +220,14 @@ async def on_raw_reaction_add(payload):
         for emoji in ACTION_EMOJIS.keys():
             await message.remove_reaction(emoji, bot.user)
 
-        # Add complete emoji reaction
+        # Add complete emoji reaction and reset status
         await message.add_reaction('✅')
+        await update_bot_status()
 
     except Exception as e:
         print(f"Error processing message: {e}")
         await message.add_reaction('❌')
+        await update_bot_status()  # Reset status in case of error
 
 # Run the bot
 if __name__ == "__main__":
@@ -201,5 +237,4 @@ if __name__ == "__main__":
         raise ValueError("Obsidian vault path not found in .env file")
 
     print("Bot is starting...")
-    print(f"{SAVE_EMOJI_NAME}")
     bot.run(DISCORD_TOKEN)
