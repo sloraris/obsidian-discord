@@ -23,7 +23,7 @@ DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 ALLOWED_GUILD_IDS = os.getenv('ALLOWED_GUILD_IDS')
 OBSIDIAN_VAULT_PATH = os.getenv('OBSIDIAN_VAULT_PATH')
 BOT_CHANNEL_NAME = os.getenv('BOT_CHANNEL_NAME')
-SAVE_EMOJI_NAME = ('SAVE_EMOJI_NAME')
+SAVE_EMOJI_NAME = os.getenv('SAVE_EMOJI_NAME')
 
 # Action emojis and their meanings
 ACTION_EMOJIS = {
@@ -129,10 +129,13 @@ async def on_message(message):
         for emoji in ACTION_EMOJIS.keys():
             await message.add_reaction(emoji)
 
-        # Find the obsidian emoji in the server
+        # Find the obsidian emoji in the server and wait for it to be reacted on the message
         obsidian_emoji = discord.utils.get(message.guild.emojis, name=SAVE_EMOJI_NAME)
         if obsidian_emoji:
+            print(f"{obsidian_emoji} found, waiting for message reaction...")
             await message.add_reaction(obsidian_emoji)
+        else:
+            print(f"{SAVE_EMOJI_NAME} not found.")
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -191,4 +194,6 @@ if __name__ == "__main__":
     if not OBSIDIAN_VAULT_PATH:
         raise ValueError("Obsidian vault path not found in .env file")
 
+    print("Bot is starting...")
+    print(f"{SAVE_EMOJI_NAME}")
     bot.run(DISCORD_TOKEN)
